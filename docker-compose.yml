@@ -1,0 +1,32 @@
+# conduit-web-demo + privacy-filter, wired over Docker's default compose network.
+# Compose gives service-name DNS, so the demo reaches privacy-filter at the bare
+# name `http://privacy-filter:8088` (no IP wiring needed, unlike Apple container).
+#
+#   docker compose up -d --build
+#   # UI: http://127.0.0.1:18088/   admin: demo-admin-pw
+services:
+  privacy-filter:
+    build:
+      context: ../privacy-filter-build
+      dockerfile: Dockerfile.conduit
+    image: privacy-filter:dev
+    restart: unless-stopped
+    # No host port published — internal only; the demo reaches it over the
+    # compose network by name.
+
+  conduit-web-demo:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: conduit-web-demo:0.1.0
+    depends_on:
+      - privacy-filter
+    ports:
+      - "18088:8088"
+    volumes:
+      - ./data:/data
+    environment:
+      CONDUIT_ADMIN_PASSWORD: demo-admin-pw
+      CONDUIT_PRIVACY_FILTER_URL: http://privacy-filter:8088
+      CONDUIT_PRIVACY_FAIL_OPEN: "false"
+    restart: unless-stopped

@@ -54,6 +54,11 @@ CREATE TABLE IF NOT EXISTS mcp_tokens (
     last_used_at TEXT,
     revoked_at TEXT
 );
+CREATE TABLE IF NOT EXISTS command_rules (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    pattern TEXT NOT NULL UNIQUE,
+    created_at TEXT NOT NULL
+);
 "#;
 
 #[derive(Clone)]
@@ -187,6 +192,70 @@ impl Store {
         Ok(())
     }
 
+    // ---- command rules (allowlist) --------------------------------------
+
+    /// All allowlist regex patterns, oldest first. Empty = blacklist-only.
+    pub async fn list_command_rules(&self) -> Result<Vec<String>> {
+        let rows: Vec<(String,)> =
+            sqlx::query_as("SELECT pattern FROM command_rules ORDER BY id")
+                .fetch_all(&self.pool)
+                .await
+                .context("list command rules")?;
+        Ok(rows.into_iter().map(|(p,)| p).collect())
+    }
+
+    /// Replace the entire allowlist with `patterns` (deduped, blanks dropped).
+    pub async fn set_command_rules(&self, patterns: &[String]) -> Result<()> {
+        let now = chrono::Utc::now().to_rfc3339();
+        let mut tx = self.pool.begin().await.context("begin")?;
+        sqlx::query("DELETE FROM command_rules")
+            .execute(&mut *tx)
+            .await
+            .context("clear rules")?;
+        for p in patterns {
+            let p = p.trim();
+            if p.is_empty() {
+                continue;
+            }
+            sqlx::query("INSERT OR IGNORE INTO command_rules(pattern, created_at) VALUES (?, ?)")
+                .bind(p)
+                .bind(&now)
+                .execute(&mut *tx)
+                .await
+                .context("insert rule")?;
+        }
+        tx.commit().await.context("commit")?;
+        Ok(())
+    }
+
+    // ---- audit -----------------------------------------------------------
+
+    /// Read recent audit events from the engine-owned `conduit_audit` table
+    /// (same DB). Optional filters by server alias / session id; newest first.
+    pub async fn list_audit(
+        &self,
+        server: Option<&str>,
+        session: Option<&str>,
+        limit: i64,
+    ) -> Result<Vec<AuditView>> {
+        let rows: Vec<AuditView> = sqlx::query_as(
+            "SELECT id, server_alias, session_id, event, command,
+                    exit_code, duration_ms, error, created_at
+             FROM conduit_audit
+             WHERE (?1 IS NULL OR server_alias = ?1)
+               AND (?2 IS NULL OR session_id = ?2)
+             ORDER BY created_at DESC
+             LIMIT ?3",
+        )
+        .bind(server)
+        .bind(session)
+        .bind(limit)
+        .fetch_all(&self.pool)
+        .await
+        .context("list audit")?;
+        Ok(rows)
+    }
+
     // ---- tokens ----------------------------------------------------------
 
     pub async fn list_tokens(&self) -> Result<Vec<TokenView>> {
@@ -271,6 +340,19 @@ pub struct ServerInput {
 
 fn default_port() -> u16 {
     22
+}
+
+#[derive(Serialize, sqlx::FromRow)]
+pub struct AuditView {
+    pub id: String,
+    pub server_alias: String,
+    pub session_id: String,
+    pub event: String,
+    pub command: Option<String>,
+    pub exit_code: Option<i64>,
+    pub duration_ms: Option<i64>,
+    pub error: Option<String>,
+    pub created_at: String,
 }
 
 #[derive(Serialize, sqlx::FromRow)]

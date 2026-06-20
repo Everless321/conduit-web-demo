@@ -149,6 +149,9 @@ const I = {
   alert:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg>',
   inbox:'<svg viewBox="0 0 24 24"><path d="M3 12h5l2 3h4l2-3h5M5 5h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/></svg>',
   link:'<svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg>',
+  audit:'<svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg>',
+  refresh:'<svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-3-6.7L21 8M21 3v5h-5"/></svg>',
+  shield:'<svg viewBox="0 0 24 24"><path d="M12 3l8 3v5c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6z"/></svg>',
 };
 
 //// i18n /////////////////////////////////////////////////////////////////
@@ -157,14 +160,20 @@ const T = {
     subtitle:'SSH-over-MCP Console',
     login_title:'Sign in', login_desc:'Enter the admin password to manage this Conduit instance.',
     password:'Admin password', sign_in:'Sign in', login_err:'Wrong admin password',
-    nav_dash:'Dashboard', nav_servers:'Servers', nav_tokens:'Tokens', logout:'Log out',
-    dash_title:'Dashboard', servers_title:'Servers', tokens_title:'Tokens',
+    nav_dash:'Dashboard', nav_servers:'Servers', nav_tokens:'Tokens', nav_audit:'Audit', nav_policy:'Policy', logout:'Log out',
+    dash_title:'Dashboard', servers_title:'Servers', tokens_title:'Tokens', audit_title:'Audit log', policy_title:'Command policy',
+    policy_status:'Status', policy_enforced:'Allowlist enforced', policy_off:'Blacklist-only',
+    policy_desc:'A command must match one allowlist pattern (regex) to run; the built-in destructive-command blacklist always applies. Empty list = allowlist off (every non-destructive command allowed).',
+    th_pattern:'Pattern (regex)', add_pattern:'Add', f_pattern_ph:'e.g. ^(ls|cat|df)( |$)',
+    no_patterns:'No allowlist patterns — every non-destructive command is allowed.', policy_saved:'Policy updated', remove:'Remove',
     stat_servers:'Servers', stat_tokens:'Active tokens',
     mcp_card:'MCP endpoint', mcp_desc:'Point any MCP client here, authenticating with a token you create on the Tokens page.',
     connect_hdr:'Connect header',
     add_server:'Add server', create_token:'Create token',
     th_alias:'Alias', th_host:'Host', th_user:'User', th_auth:'Auth', th_jump:'Jump', th_tags:'Tags', th_actions:'',
     th_id:'ID', th_label:'Label', th_created:'Created', th_lastused:'Last used', th_status:'Status',
+    th_time:'Time', th_event:'Event', th_command:'Command', th_result:'Result', th_session:'Session', th_server:'Server',
+    no_audit:'No audit events yet. Run a command through the MCP endpoint.', refresh:'Refresh',
     no_servers:'No servers yet. Add one to get started.', no_tokens:'No tokens yet. Create one for your MCP client.',
     status_active:'active', status_revoked:'revoked',
     delete:'Delete', revoke:'Revoke',
@@ -187,14 +196,20 @@ const T = {
     subtitle:'SSH-over-MCP 控制台',
     login_title:'登录', login_desc:'输入管理密码以管理此 Conduit 实例。',
     password:'管理密码', sign_in:'登录', login_err:'管理密码错误',
-    nav_dash:'概览', nav_servers:'服务器', nav_tokens:'令牌', logout:'退出登录',
-    dash_title:'概览', servers_title:'服务器', tokens_title:'令牌',
+    nav_dash:'概览', nav_servers:'服务器', nav_tokens:'令牌', nav_audit:'审计', nav_policy:'策略', logout:'退出登录',
+    dash_title:'概览', servers_title:'服务器', tokens_title:'令牌', audit_title:'审计日志', policy_title:'命令策略',
+    policy_status:'状态', policy_enforced:'白名单已启用', policy_off:'仅黑名单',
+    policy_desc:'命令需匹配白名单中任一正则才能执行;内置的破坏性命令黑名单始终生效。清空列表 = 关闭白名单(放行所有非破坏性命令)。',
+    th_pattern:'规则(正则)', add_pattern:'添加', f_pattern_ph:'如 ^(ls|cat|df)( |$)',
+    no_patterns:'没有白名单规则 —— 所有非破坏性命令均放行。', policy_saved:'策略已更新', remove:'移除',
     stat_servers:'服务器', stat_tokens:'有效令牌',
     mcp_card:'MCP 端点', mcp_desc:'把任意 MCP 客户端指向这里，并用「令牌」页面创建的令牌进行认证。',
     connect_hdr:'认证请求头',
     add_server:'添加服务器', create_token:'创建令牌',
     th_alias:'别名', th_host:'主机', th_user:'用户', th_auth:'认证', th_jump:'跳板', th_tags:'标签', th_actions:'',
     th_id:'ID', th_label:'名称', th_created:'创建时间', th_lastused:'最近使用', th_status:'状态',
+    th_time:'时间', th_event:'事件', th_command:'命令', th_result:'结果', th_session:'会话', th_server:'服务器',
+    no_audit:'还没有审计记录。通过 MCP 端点执行一条命令试试。', refresh:'刷新',
     no_servers:'还没有服务器，添加一个开始吧。', no_tokens:'还没有令牌，为你的 MCP 客户端创建一个。',
     status_active:'有效', status_revoked:'已吊销',
     delete:'删除', revoke:'吊销',
@@ -272,7 +287,7 @@ function renderLogin(err){
 }
 
 //// shell ////////////////////////////////////////////////////////////////
-const NAV=[['dash',()=>I.dash,'nav_dash'],['servers',()=>I.server,'nav_servers'],['tokens',()=>I.key,'nav_tokens']];
+const NAV=[['dash',()=>I.dash,'nav_dash'],['servers',()=>I.server,'nav_servers'],['tokens',()=>I.key,'nav_tokens'],['policy',()=>I.shield,'nav_policy'],['audit',()=>I.audit,'nav_audit']];
 function renderShell(){
   $('#root').innerHTML=`
   <div id="app">
@@ -302,15 +317,18 @@ function renderShell(){
 function mcpUrl(){ return location.origin+'/mcp'; }
 
 async function renderView(){
-  const titleMap={dash:'dash_title',servers:'servers_title',tokens:'tokens_title'};
+  const titleMap={dash:'dash_title',servers:'servers_title',tokens:'tokens_title',audit:'audit_title',policy:'policy_title'};
   $('#vtitle').textContent=t(titleMap[S.view]);
   const va=$('#vaction'); va.innerHTML='';
   if(S.view==='servers'){const b=document.createElement('button');b.className='btn';b.innerHTML=I.plus+t('add_server');b.onclick=openServerModal;va.appendChild(b);}
   if(S.view==='tokens'){const b=document.createElement('button');b.className='btn';b.innerHTML=I.plus+t('create_token');b.onclick=openTokenModal;va.appendChild(b);}
+  if(S.view==='audit'){const b=document.createElement('button');b.className='btn ghost';b.innerHTML=I.refresh+t('refresh');b.onclick=()=>viewAudit();va.appendChild(b);}
   try{
     if(S.view==='dash') await viewDash();
     if(S.view==='servers') await viewServers();
     if(S.view==='tokens') await viewTokens();
+    if(S.view==='policy') await viewPolicy();
+    if(S.view==='audit') await viewAudit();
   }catch(e){ if(e&&e.unauth){bounce();return;} toast(e.message||'error','err'); }
 }
 
@@ -364,6 +382,57 @@ async function viewTokens(){
     <th>${t('th_id')}</th><th>${t('th_label')}</th><th>${t('th_created')}</th><th>${t('th_lastused')}</th><th>${t('th_status')}</th><th></th>
     </tr></thead><tbody>${rows}</tbody></table></div>`;
   document.querySelectorAll('[data-rev]').forEach(b=>b.onclick=()=>revokeTok(b.dataset.rev));
+}
+
+async function viewAudit(){
+  const {audit}=await api('GET','/api/audit?limit=200');
+  const rows = audit.length ? audit.map(a=>{
+    let res;
+    if(a.exit_code===0||a.exit_code>0) res=`<span class="pill ${a.exit_code===0?'ok':'bad'}">exit ${a.exit_code}</span>`+(a.duration_ms!=null?` <span class="dim">${a.duration_ms}ms</span>`:'');
+    else if(a.error) res=`<span class="pill bad">error</span>`;
+    else res='<span class="dim">—</span>';
+    const cmd = a.command ? `<span class="mono">${esc(a.command)}</span>`
+      : (a.error ? `<span class="mono" style="color:var(--bad)">${esc(a.error)}</span>` : '<span class="dim">—</span>');
+    return `<tr>
+      <td class="dim mono" style="font-size:12px;white-space:nowrap">${esc((a.created_at||'').slice(0,19).replace('T',' '))}</td>
+      <td><b>${esc(a.server_alias)}</b></td>
+      <td><span class="pill acc">${esc(a.event)}</span></td>
+      <td style="max-width:380px;word-break:break-all;font-size:12px">${cmd}</td>
+      <td style="white-space:nowrap">${res}</td>
+      <td class="dim mono" style="font-size:11px">${esc((a.session_id||'').slice(0,11))}</td></tr>`;
+  }).join('') : `<tr><td colspan="6"><div class="empty">${I.audit}<div>${t('no_audit')}</div></div></td></tr>`;
+  $('#view').innerHTML=`<div class="card"><table><thead><tr>
+    <th>${t('th_time')}</th><th>${t('th_server')}</th><th>${t('th_event')}</th><th>${t('th_command')}</th><th>${t('th_result')}</th><th>${t('th_session')}</th>
+    </tr></thead><tbody>${rows}</tbody></table></div>`;
+}
+
+async function viewPolicy(){
+  const p = await api('GET','/api/policy');
+  const status = p.enforced
+    ? `<span class="pill ok">${t('policy_enforced')}</span>`
+    : `<span class="pill">${t('policy_off')}</span>`;
+  const rows = p.patterns.length ? p.patterns.map((pat,i)=>`<tr>
+      <td class="mono">${esc(pat)}</td>
+      <td style="text-align:right"><button class="btn danger" data-delp="${i}">${I.trash}${t('remove')}</button></td></tr>`).join('')
+    : `<tr><td colspan="2"><div class="empty">${I.shield}<div>${t('no_patterns')}</div></div></td></tr>`;
+  $('#view').innerHTML=`
+    <div class="card" style="margin-bottom:18px"><div style="padding:18px 20px;display:flex;align-items:center;gap:13px">
+      <div class="ico" style="width:38px;height:38px;border-radius:9px;background:var(--accbg);color:var(--acc);display:flex;align-items:center;justify-content:center;flex:none">${I.shield}</div>
+      <div style="flex:1"><div style="font-weight:600;margin-bottom:3px">${t('policy_status')} · ${status}</div>
+      <div class="dim" style="font-size:12.5px;line-height:1.45">${t('policy_desc')}</div></div></div></div>
+    <div class="card">
+      <div style="display:flex;gap:8px;padding:14px 20px;border-bottom:1px solid var(--line)">
+        <input id="np" placeholder="${t('f_pattern_ph')}" style="flex:1">
+        <button class="btn" id="addp">${I.plus}${t('add_pattern')}</button>
+      </div>
+      <table><thead><tr><th>${t('th_pattern')}</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>`;
+  $('#addp').onclick=()=>{ const v=$('#np').value.trim(); if(!v)return; savePolicy([...p.patterns,v]); };
+  $('#np').onkeydown=e=>{ if(e.key==='Enter'){e.preventDefault();$('#addp').click();} };
+  document.querySelectorAll('[data-delp]').forEach(b=>b.onclick=()=>savePolicy(p.patterns.filter((_,j)=>j!==+b.dataset.delp)));
+}
+async function savePolicy(patterns){
+  try{ await api('PUT','/api/policy',{patterns}); toast(t('policy_saved')); viewPolicy(); }
+  catch(e){ if(e&&e.unauth)return bounce(); toast(e.message,'err'); }
 }
 
 //// modals ///////////////////////////////////////////////////////////////

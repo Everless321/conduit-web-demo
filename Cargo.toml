@@ -12,13 +12,16 @@ path = "src/main.rs"
 # Standalone build: pulls the conduit crates from GitHub, pinned to a release
 # tag. For fast local iteration against a side-by-side ../conduit checkout,
 # swap these back to `path = "..."`.
-conduit-core = { git = "https://github.com/Everless321/conduit", package = "conduit-core", tag = "v0.1.0" }
-conduit-engine = { git = "https://github.com/Everless321/conduit", package = "conduit-engine", tag = "v0.1.0" }
-conduit-store-dibs = { git = "https://github.com/Everless321/conduit", package = "conduit-store-dibs", tag = "v0.1.0" }
+conduit-core = { git = "https://github.com/Everless321/conduit", package = "conduit-core", tag = "v0.2.0" }
+conduit-engine = { git = "https://github.com/Everless321/conduit", package = "conduit-engine", tag = "v0.2.0" }
+conduit-store-dibs = { git = "https://github.com/Everless321/conduit", package = "conduit-store-dibs", tag = "v0.2.0" }
 
 tokio = { version = "1.40", features = ["full"] }
 axum = "0.7"
 anyhow = "1"
+async-trait = "0.1"
+regex = "1"
+reqwest = { version = "0.12", default-features = false, features = ["json"] }
 clap = { version = "4", features = ["derive", "env"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
