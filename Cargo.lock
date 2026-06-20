@@ -577,7 +577,7 @@ dependencies = [
 [[package]]
 name = "conduit-core"
 version = "0.1.0"
-source = "git+https://github.com/Everless321/conduit?branch=main#97d7687987e0014666ea70484e5cf41da215b5b5"
+source = "git+https://github.com/Everless321/conduit?tag=v0.1.0#97d7687987e0014666ea70484e5cf41da215b5b5"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -594,7 +594,7 @@ dependencies = [
 [[package]]
 name = "conduit-engine"
 version = "0.1.0"
-source = "git+https://github.com/Everless321/conduit?branch=main#97d7687987e0014666ea70484e5cf41da215b5b5"
+source = "git+https://github.com/Everless321/conduit?tag=v0.1.0#97d7687987e0014666ea70484e5cf41da215b5b5"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -619,7 +619,7 @@ dependencies = [
 [[package]]
 name = "conduit-store-dibs"
 version = "0.1.0"
-source = "git+https://github.com/Everless321/conduit?branch=main#97d7687987e0014666ea70484e5cf41da215b5b5"
+source = "git+https://github.com/Everless321/conduit?tag=v0.1.0#97d7687987e0014666ea70484e5cf41da215b5b5"
 dependencies = [
  "anyhow",
  "async-trait",

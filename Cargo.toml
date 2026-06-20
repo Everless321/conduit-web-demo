@@ -9,12 +9,12 @@ name = "conduit-web-demo"
 path = "src/main.rs"
 
 [dependencies]
-# Standalone build: pulls the conduit crates from GitHub. Cargo.lock pins the
-# exact commit, so checkouts are reproducible. For fast local iteration against
-# a side-by-side ../conduit checkout, swap these back to `path = "..."`.
-conduit-core = { git = "https://github.com/Everless321/conduit", package = "conduit-core", branch = "main" }
-conduit-engine = { git = "https://github.com/Everless321/conduit", package = "conduit-engine", branch = "main" }
-conduit-store-dibs = { git = "https://github.com/Everless321/conduit", package = "conduit-store-dibs", branch = "main" }
+# Standalone build: pulls the conduit crates from GitHub, pinned to a release
+# tag. For fast local iteration against a side-by-side ../conduit checkout,
+# swap these back to `path = "..."`.
+conduit-core = { git = "https://github.com/Everless321/conduit", package = "conduit-core", tag = "v0.1.0" }
+conduit-engine = { git = "https://github.com/Everless321/conduit", package = "conduit-engine", tag = "v0.1.0" }
+conduit-store-dibs = { git = "https://github.com/Everless321/conduit", package = "conduit-store-dibs", tag = "v0.1.0" }
 
 tokio = { version = "1.40", features = ["full"] }
 axum = "0.7"
